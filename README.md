@@ -11,6 +11,7 @@
 El sistema incluirá las siguientes funcionalidades:
 - **Gestión de libros**: Agregar, editar, eliminar y visualizar libros disponibles en la biblioteca.
 - **Gestión de usuarios**: Registrar, modificar y eliminar usuarios del sistema.
+- **Gestión de clientes**: Registrar, modificar y eliminar clientes del sistema.
 - **Préstamos y devoluciones**: Controlar los libros prestados a los usuarios y gestionar sus devoluciones.
 - **Historial de préstamos**: Consultar registros de préstamos realizados.
 - **Autenticación de usuarios**: Acceso seguro mediante credenciales.
