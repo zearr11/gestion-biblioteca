@@ -1,0 +1,32 @@
+.navbar-biblioteca {
+    position: fixed;
+    width: 100%;
+    z-index: 1050;
+    background: linear-gradient(to left, #5D4037, #684940);
+}
+
+.navbar-biblioteca .navbar-brand,
+.navbar-biblioteca .nav-link {
+    color: #fff;
+}
+
+.navbar-biblioteca .nav-link:hover {
+    color: #D7CCC8; 
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    /*flex-grow: 1;*/
+    flex: 1;
+    padding-top: 70px;
+}
+
+footer {
+    background-color: #343a40;
+}

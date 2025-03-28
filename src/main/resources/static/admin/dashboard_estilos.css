@@ -1,0 +1,54 @@
+.card {
+    margin-left: -10px;
+    margin-right: -10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+#icon1 {
+    background-color: darkcyan;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#icon2 {
+    background-color: brown;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#icon3 {
+    background-color: darkorange;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#icon4 {
+    background-color: darkolivegreen;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#icon5 {
+    background-color: deeppink;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#icon6 {
+    background-color: lightskyblue;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
