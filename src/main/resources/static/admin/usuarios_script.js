@@ -1,4 +1,15 @@
+vistaHabilitadosInhabilitados();
+
 document.getElementById("view-filter-lst").addEventListener("change", () => {
+    vistaHabilitadosInhabilitados();
+    cambiarEstado(document.getElementById('estadoFiltro').value);
+});
+
+function cambiarEstado(valor) {
+    window.location.href = `/usuarios?estado=${valor}&filtroBusqueda=`;
+}
+
+function vistaHabilitadosInhabilitados() {
     let elemento = document.getElementById("seleccionActInact");
     let activos = document.getElementsByClassName("UsuariosActivos");
     let inactivos = document.getElementsByClassName("UsuariosInactivos");
@@ -7,18 +18,44 @@ document.getElementById("view-filter-lst").addEventListener("change", () => {
     const buscador = document.getElementById('buscador');
     const lstActivos = parseInt(buscador.getAttribute('data-activos'));
     const lstInactivos = parseInt(buscador.getAttribute('data-inactivos'));
+    const estadoFiltro = document.getElementById('estadoFiltro');
+
+    const idSinCoincActivo = document.getElementById("sinCoincidenciasActivos");
+    const idSinCoincInactivo = document.getElementById("sinCoincidenciasInactivos");
+    
+    if (idSinCoincActivo) {
+        idSinCoincActivo.style.display = 'none'
+    }
+    if (idSinCoincInactivo) {
+        idSinCoincInactivo.style.display = 'none'
+    }
     
     if (document.getElementById("view-filter-lst").value == "1") { // Muestra Usuarios Activos
         elemento.style.background = "#198754";
         buscador.style.display = (lstActivos > 0) ? 'block' : 'none'; // Muestra u Oculta el buscador
+        
+        if (idSinCoincInactivo) {
+            idSinCoincInactivo.style.display = 'block'
+            buscador.style.display = 'block';
+        }
+
+        estadoFiltro.value = 'Activo'
         habilitarVistaLsts(activos);
+        
     }
     else { // Muestra Usuarios Inactivos
         elemento.style.background = "#dc3545";
         buscador.style.display = (lstInactivos > 0) ? 'block' : 'none'; // Muestra u Oculta el buscador
+        
+        if(idSinCoincActivo) {
+            idSinCoincActivo.style.display = 'block'
+            buscador.style.display = 'block';
+        }
+
+        estadoFiltro.value = 'Inactivo'
         habilitarVistaLsts(inactivos);
     }
-});
+}
 
 function deshabilitarVistaLsts(activos, inactivos) {
     for (let i = 0; i < activos.length; i++) {

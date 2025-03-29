@@ -36,7 +36,7 @@ public class DashboardController {
     @GetMapping()
     public String verDashboard(Model model) {
 
-        model.addAttribute("totalUsuarios", usuarioUtil.totalUsuarios());
+        model.addAttribute("totalUsuarios", usuarioUtil.totalUsuarios()-1);
         model.addAttribute("totalLectores", lectorUtil.totalLectores());
         model.addAttribute("totalLibros", libroUtil.totalLibros());
         model.addAttribute("totalCategorias", categoriaUtil.totalCategorias());

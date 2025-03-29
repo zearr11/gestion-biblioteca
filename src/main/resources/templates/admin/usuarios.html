@@ -15,11 +15,23 @@
                 <hr>
                 <div class="row">
                     <div class="col-4">
-                        <div id="buscador"
-                            th:data-activos="${usuariosActivos.size()}"
-                            th:data-inactivos="${usuariosInactivos.size()}"
-                            th:style="${(usuariosActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
-                            <input type="search" class="form-control" placeholder="Buscar">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${usuariosActivos.size()}"
+                                th:data-inactivos="${usuariosInactivos.size()}"
+                                th:style="${(usuariosActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/usuarios}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/usuarios'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="col-5 d-flex justify-content-end">
@@ -31,8 +43,8 @@
                     <div class="col-3 d-flex justify-content-end">
                         <div class="col-10">
                             <select class="form-select" id="view-filter-lst">
-                                <option value="1" selected>Usuarios Habilitados</option>
-                                <option value="2">Usuarios Inhabilitados</option>
+                                <option value="1" th:selected="${estado == 'Activo'}">Usuarios Habilitados</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Usuarios Inhabilitados</option>
                             </select>
                         </div>
                         &nbsp;&nbsp;
@@ -100,6 +112,19 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de usuarios activos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/usuarios'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
 
                     <div id="tablaInactivos" class="UsuariosInactivos" th:if="${usuariosInactivos.size() > 0}">
@@ -147,11 +172,28 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de usuarios inactivos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/usuarios'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
                     
                     <div>
-                        <p class="UsuariosActivos mt-4" th:if="${usuariosActivos.size() == 0}">No hay otros usuarios habilitados.</p>
-                        <p class="UsuariosInactivos mt-4" th:if="${usuariosInactivos.size() == 0}">No hay usuarios inhabilitados.</p>
+                        <p class="UsuariosActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No hay otros usuarios habilitados.</p>
+                        <p class="UsuariosInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No hay usuarios inhabilitados.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
                     </div>
                     
                 </div>
