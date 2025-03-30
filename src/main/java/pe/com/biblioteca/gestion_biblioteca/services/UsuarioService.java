@@ -1,10 +1,12 @@
 package pe.com.biblioteca.gestion_biblioteca.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import pe.com.biblioteca.gestion_biblioteca.dtos.UsuarioDTO;
 import pe.com.biblioteca.gestion_biblioteca.models.Usuario;
 import pe.com.biblioteca.gestion_biblioteca.repositories.UsuarioRepository;
 
@@ -39,6 +41,28 @@ public class UsuarioService {
         String state = (usuarioToDelete.getEstado().equals("Activo")) ? "Inactivo" : "Activo";
         usuarioToDelete.setEstado(state);
         return this.usuarioRepository.saveAndFlush(usuarioToDelete);
+    }
+
+    public List<UsuarioDTO> findAllDTO() {
+        List<UsuarioDTO> usuariosMapped = new ArrayList<>();
+
+        for (Usuario usuario : this.findAll()) {
+            UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+            usuarioDTO.setIdUsuario(usuario.getIdUsuario());
+            usuarioDTO.setUsername(usuario.getUsuario());
+            usuarioDTO.setRol(usuario.getRol());
+            usuarioDTO.setEstado(usuario.getEstado());
+            usuarioDTO.setNombres(usuario.getPersona().getNombres());
+            usuarioDTO.setApellidos(usuario.getPersona().getApellidos());
+            usuarioDTO.setTipoDoc(usuario.getPersona().getTipoDoc());
+            usuarioDTO.setNumeroDoc(usuario.getPersona().getNumeroDoc());
+            usuarioDTO.setGenero(usuario.getPersona().getGenero());
+            usuarioDTO.setCorreo(usuario.getPersona().getCorreo());
+
+            usuariosMapped.add(usuarioDTO);
+        }
+        return usuariosMapped;
     }
 
 }

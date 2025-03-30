@@ -64,25 +64,7 @@ public class UsuarioUtil {
     }
 
     public List<UsuarioDTO> getAllUsuariosDTO() {
-        List<UsuarioDTO> usuariosMapped = new ArrayList<>();
-        UsuarioDTO usuarioDTO = new UsuarioDTO();
-
-        for (Usuario usuario : this.usuarioService.findAll()) {
-            if (usuario.getRol().equals("ADMIN") || usuario.getRol().equals("USUARIO")) {
-                usuarioDTO.setIdUsuario(usuario.getIdUsuario());
-                usuarioDTO.setUsername(usuario.getUsuario());
-                usuarioDTO.setRol(usuario.getRol());
-                usuarioDTO.setEstado(usuario.getEstado());
-                usuarioDTO.setNombres(usuario.getPersona().getNombres());
-                usuarioDTO.setApellidos(usuario.getPersona().getApellidos());
-                usuarioDTO.setTipoDoc(usuario.getPersona().getTipoDoc());
-                usuarioDTO.setNumeroDoc(usuario.getPersona().getNumeroDoc());
-                usuarioDTO.setGenero(usuario.getPersona().getGenero());
-                usuarioDTO.setCorreo(usuario.getPersona().getCorreo());
-                usuariosMapped.add(usuarioDTO);
-            }
-        }
-        return usuariosMapped;
+        return this.usuarioService.findAllDTO();
     }
 
     // Sin uso

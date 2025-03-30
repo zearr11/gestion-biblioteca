@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import pe.com.biblioteca.gestion_biblioteca.dtos.UsuarioDTO;
 import pe.com.biblioteca.gestion_biblioteca.models.Usuario;
 import pe.com.biblioteca.gestion_biblioteca.services.UsuarioService;
 
@@ -12,6 +14,24 @@ public class LectorUtil {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    // Modificar lector sin contraseña
+    public void modificarLector(UsuarioDTO entity) {
+        Usuario lectorToUpdate = this.usuarioService.findById(entity.getIdUsuario());
+        lectorToUpdate.setUsuario(entity.getUsername());
+        lectorToUpdate.getPersona().setApellidos(entity.getApellidos());
+        lectorToUpdate.getPersona().setCorreo(entity.getCorreo());
+        lectorToUpdate.getPersona().setGenero(entity.getGenero());
+        lectorToUpdate.getPersona().setNombres(entity.getNombres());
+        lectorToUpdate.getPersona().setNumeroDoc(entity.getNumeroDoc());
+        lectorToUpdate.getPersona().setTipoDoc(entity.getTipoDoc());
+        this.usuarioService.updateWhitoutPassword(lectorToUpdate);
+    }
+
+    // Cambia el estado del lector (Simula la eliminacion)
+    public void cambiarEstadoLector(Long id) {
+        this.usuarioService.enableDissable(id);
+    }
 
     public int totalLectores() {
         List<Usuario> lectores = new ArrayList<>();
@@ -33,6 +53,28 @@ public class LectorUtil {
             }
         }
         return lectores;
+    }
+
+    public List<Usuario> getAllLectoresActivos() {
+        List<Usuario> lectoresActivos = new ArrayList<>();
+        
+        for (Usuario lector : this.getAllLectores()) {
+            if (lector.getEstado().equals("Activo")) {
+                lectoresActivos.add(lector);
+            }
+        }
+        return lectoresActivos;
+    }
+
+    public List<Usuario> getAllLectoresInactivos() {
+        List<Usuario> lectoresInactivos = new ArrayList<>();
+
+        for (Usuario lector : this.getAllLectores()) {
+            if (!lector.getEstado().equals("Activo")) {
+                lectoresInactivos.add(lector);
+            }
+        }
+        return lectoresInactivos;
     }
     
 }

@@ -1,18 +1,29 @@
+// CONTROL DE PAGINA MAESTRA
+const wrapper = document.getElementById('wrapper');
+const menuToggle = document.getElementById('menu-toggle');
+
+if(menuToggle) {
+    menuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        wrapper.classList.toggle('toggled');
+    });
+}
+
 vistaHabilitadosInhabilitados();
 
-document.getElementById("view-filter-lst").addEventListener("change", () => {
+document.getElementById("view-filter-lst").addEventListener("change", () => { 
     vistaHabilitadosInhabilitados();
     cambiarEstado(document.getElementById('estadoFiltro').value);
 });
 
-function cambiarEstado(valor) {
-    window.location.href = `/usuarios?estado=${valor}&filtroBusqueda=`;
+function cambiarEstado(valor) { 
+    window.location.href = `/lectores?estado=${valor}&filtroBusqueda=`;
 }
 
-function vistaHabilitadosInhabilitados() {
+function vistaHabilitadosInhabilitados() { 
     let elemento = document.getElementById("seleccionActInact");
-    let activos = document.getElementsByClassName("UsuariosActivos");
-    let inactivos = document.getElementsByClassName("UsuariosInactivos");
+    let activos = document.getElementsByClassName("LectoresActivos");
+    let inactivos = document.getElementsByClassName("LectoresInactivos");
     deshabilitarVistaLsts(activos, inactivos);
 
     const buscador = document.getElementById('buscador');
@@ -67,109 +78,15 @@ function deshabilitarVistaLsts(activos, inactivos) {
     }
 }
 
-function habilitarVistaLsts(classList) {
+function habilitarVistaLsts(classList) { 
     for (let i = 0; i < classList.length; i++) {
         classList[i].style.display = "block";
     }
 }
 
-const wrapper = document.getElementById('wrapper');
-const menuToggle = document.getElementById('menu-toggle');
-
-if(menuToggle) {
-    menuToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        wrapper.classList.toggle('toggled');
-    });
-}
-
-// Reseteo de formulario agregar usuario
-document.getElementById("btn-add-usuario").addEventListener("click", () => {
-    let form = document.getElementById("form-add-usuario");
-    form.reset();
-})
-
-// Validación de formulario agregar usuario
-document.getElementById("form-add-usuario").addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // Toast de error (Alerta que aparece en la parte inferior de la pantalla)
-    let toastElement = new bootstrap.Toast(document.getElementById("toastError"));
-    let toastMessage = document.getElementById("toastMessage");
-
-    // Elementos a validar
-    let correo = document.getElementById("correo").value;
-    let genero = document.getElementById("genero").value;
-    let tipoDoc = document.getElementById("tipoDoc").value;
-    let numeroDoc = document.getElementById("numeroDoc").value;
-    let rol = document.getElementById("rol").value;
-    let contrasenia = document.getElementById("contrasenia").value;
-    let usuario = document.getElementById("usuario").value;
-    
-    let regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    let msg = "";
-    
-    if (!regexCorreo.test(correo)) {
-        msg = ("El correo ingresado no es válido.");
-    }
-    else if (genero == "") {
-        msg = ("Debe seleccionar un género.");
-    }
-    else if (tipoDoc == "") {
-        msg = ("Debe seleccionar un tipo de documento.");
-    }
-    else if (tipoDoc == "DNI" && numeroDoc.length != 8) {
-        msg = ("El DNI debe tener 8 dígitos.");
-    }
-    else if (tipoDoc == "CE" && numeroDoc.length < 8) {
-        msg = ("El Carné de Extranjería no puede tener menos de 8 caracteres.");
-    }
-    else if (rol == "") {
-        msg = ("Debe seleccionar un rol.");
-    }
-    else if (validacionNuevoUsuarioBD(correo, numeroDoc, usuario) !== "") {
-        msg = validacionNuevoUsuarioBD(correo, numeroDoc, usuario);
-    }
-    else {
-        if (contrasenia.length < 8) msg = ("La contraseña debe tener al menos 8 caracteres.");
-        else if (!/[A-Z]/.test(contrasenia)) msg = ("Debe incluir al menos una letra mayúscula.");
-        else if (!/[a-z]/.test(contrasenia)) msg = ("Debe incluir al menos una letra minúscula.");
-        else if (!/[0-9]/.test(contrasenia)) msg = ("Debe incluir al menos un número.");
-        else if (!/[!@#$%^&*(),.?":{}|<>]/.test(contrasenia)) msg = ("Debe incluir al menos un carácter especial.");
-    }
-
-    if (msg !== "") {
-        toastMessage.textContent = msg;
-        toastElement.show();
-    }
-    else{
-        this.submit();
-    }
-});
-
-// Validación de contraseña de formulario agregar usuario
-document.getElementById("contrasenia").addEventListener("input", function () {
-    let password = this.value;
-
-    document.getElementById("lengthCriteria").classList.toggle("text-success", password.length >= 8);
-    document.getElementById("lengthCriteria").classList.toggle("text-danger", password.length < 8);
-
-    document.getElementById("uppercaseCriteria").classList.toggle("text-success", /[A-Z]/.test(password));
-    document.getElementById("uppercaseCriteria").classList.toggle("text-danger", !/[A-Z]/.test(password));
-
-    document.getElementById("lowercaseCriteria").classList.toggle("text-success", /[a-z]/.test(password));
-    document.getElementById("lowercaseCriteria").classList.toggle("text-danger", !/[a-z]/.test(password));
-
-    document.getElementById("numberCriteria").classList.toggle("text-success", /[0-9]/.test(password));
-    document.getElementById("numberCriteria").classList.toggle("text-danger", !/[0-9]/.test(password));
-
-    document.getElementById("specialCharCriteria").classList.toggle("text-success", /[!@#$%^&*(),.?":{}|<>]/.test(password));
-    document.getElementById("specialCharCriteria").classList.toggle("text-danger", !/[!@#$%^&*(),.?":{}|<>]/.test(password));
-});
-
-// Modal para ver datos de usuario
+// Modal para ver datos de lector
 document.addEventListener("DOMContentLoaded", function () {
-    let modal = document.getElementById("verDatosUsuario");
+    let modal = document.getElementById("verDatosLector");
     
     modal.addEventListener("show.bs.modal", function (event) {
         let button = event.relatedTarget;
@@ -188,8 +105,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Carga de datos en formulario editar usuario
-document.getElementById("editUsuarioModal").addEventListener("show.bs.modal", function(event) {
+// Carga de datos en formulario editar lector
+document.getElementById("editLectorModal").addEventListener("show.bs.modal", function(event) {
     let button = event.relatedTarget;
     if (!button) return;
     document.getElementById("idUsuario").value = button.getAttribute("data-idUsuario");
@@ -200,11 +117,10 @@ document.getElementById("editUsuarioModal").addEventListener("show.bs.modal", fu
     document.getElementById("tipoDocEdit").value = button.getAttribute("data-tipoDoc");
     document.getElementById("numeroDocEdit").value = button.getAttribute("data-numeroDoc");
     document.getElementById("usuarioEdit").value = button.getAttribute("data-username");
-    document.getElementById("rolEdit").value = button.getAttribute("data-rol");
 });
 
-// Validación de formulario editar usuario
-document.getElementById("form-edit-usuario").addEventListener("submit", function (event) {
+// Validación de formulario editar lector
+document.getElementById("form-edit-lector").addEventListener("submit", function (event) {
     event.preventDefault();
 
     // Toast de error (Alerta que aparece en la parte inferior de la pantalla)
@@ -216,7 +132,6 @@ document.getElementById("form-edit-usuario").addEventListener("submit", function
     let genero = document.getElementById("generoEdit").value;
     let tipoDoc = document.getElementById("tipoDocEdit").value;
     let numeroDoc = document.getElementById("numeroDocEdit").value;
-    let rol = document.getElementById("rolEdit").value;
     let usuario = document.getElementById("usuarioEdit").value;
     let idUsuario = document.getElementById("idUsuario").value;
     
@@ -238,9 +153,6 @@ document.getElementById("form-edit-usuario").addEventListener("submit", function
     else if (tipoDoc == "CE" && numeroDoc.length < 8) {
         msg = ("El Carné de Extranjería no puede tener menos de 8 caracteres.");
     }
-    else if (rol == "") {
-        msg = ("Debe seleccionar un rol.");
-    }
     else if (validacionEdicionUsuarioBD(correo, numeroDoc, usuario, idUsuario) !== "") {
         msg = validacionEdicionUsuarioBD(correo, numeroDoc, usuario, idUsuario);
     }
@@ -254,7 +166,7 @@ document.getElementById("form-edit-usuario").addEventListener("submit", function
     }
 });
 
-// Carga Modal para deshabilitar usuario
+// Carga Modal para deshabilitar lector
 document.getElementById("dissableModal").addEventListener("show.bs.modal", function(event) {
     let button = event.relatedTarget;
     if (!button) return;
@@ -264,7 +176,7 @@ document.getElementById("dissableModal").addEventListener("show.bs.modal", funct
     document.getElementById("idUsuarioDissable").value = id;
 });
 
-// Carga Modal para habilitar usuario
+// Carga Modal para habilitar lector
 document.getElementById("habilitarModal").addEventListener("show.bs.modal", function(event) {
     let button = event.relatedTarget;
     if (!button) return;
@@ -273,23 +185,6 @@ document.getElementById("habilitarModal").addEventListener("show.bs.modal", func
     document.getElementById('usuarioName2').textContent = nombresCompletos;
     document.getElementById("idUsuarioEnable").value = id;
 });
-
-// Validacion de datos del form con datos almacenados en la bd
-function validacionNuevoUsuarioBD(correo, numeroDoc, usuario) {
-    let msg = "";
-    for (let i = 0; i < dataUsuariosBD.length; i++) {
-        if (dataUsuariosBD[i].correo == correo) {
-            msg = "El correo ingresado ya está registrado.";
-        }
-        else if (dataUsuariosBD[i].numeroDoc == numeroDoc) {
-            msg = "El documento ingresado ya está registrado.";
-        }
-        else if (dataUsuariosBD[i].username == usuario) {
-            msg = "El usuario ingresado ya está registrado.";
-        }
-    }
-    return msg;
-}
 
 function validacionEdicionUsuarioBD(correo, numeroDoc, usuario, id) {
     let msg = "";
@@ -314,4 +209,6 @@ fetch('http://localhost:8080/usuarios/obtener-usuarios')
     .then(response => response.json())
     .then(usuarios => {
         dataUsuariosBD = usuarios;
+        console.log(dataUsuariosBD);
     }).catch(error => console.error('Error:', error));
+

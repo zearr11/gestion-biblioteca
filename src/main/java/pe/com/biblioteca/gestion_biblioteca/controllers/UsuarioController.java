@@ -27,7 +27,7 @@ public class UsuarioController {
     @Autowired
     private AuthService authService;
     @Autowired
-    private UsuariosPaginacion paginacionUtil;
+    private UsuariosPaginacion usuariosPaginacion;
     
     @GetMapping()
     public String verUsuarios(@RequestParam(name="page", defaultValue = "1") int page,
@@ -41,33 +41,33 @@ public class UsuarioController {
 
         List<Usuario> usuariosActivos = new ArrayList<>();
         List<Usuario> usuariosInactivos = new ArrayList<>();
-        int cantidadFilasActivos = paginacionUtil.getCantidadFilasUsuarios("Activo");
-        int cantidadFilasInactivos = paginacionUtil.getCantidadFilasUsuarios("Inactivo");
+        int cantidadFilasActivos = usuariosPaginacion.getCantidadFilasUsuarios("Activo");
+        int cantidadFilasInactivos = usuariosPaginacion.getCantidadFilasUsuarios("Inactivo");
 
         // Si no hay filtro de busqueda
         if (filtroBusqueda.equals("")) {
             if (estado.equals("Activo")) {
-                usuariosActivos = paginacionUtil.getUsuariosXfila(page, "Activo");
-                usuariosInactivos = paginacionUtil.getUsuariosXfila(1, "Inactivo");
+                usuariosActivos = usuariosPaginacion.getUsuariosXfila(page, "Activo");
+                usuariosInactivos = usuariosPaginacion.getUsuariosXfila(1, "Inactivo");
             }
             else {
-                usuariosInactivos = paginacionUtil.getUsuariosXfila(page, "Inactivo");
-                usuariosActivos = paginacionUtil.getUsuariosXfila(1, "Activo");
+                usuariosInactivos = usuariosPaginacion.getUsuariosXfila(page, "Inactivo");
+                usuariosActivos = usuariosPaginacion.getUsuariosXfila(1, "Activo");
             }
         }
         else { // Si hay filtro de busqueda
             if (estado.equals("Activo")) {
-                usuariosActivos = paginacionUtil.filtroBusquedaUsuario("Activo", filtroBusqueda, page);
-                cantidadFilasActivos = paginacionUtil.getCantidadFilasUsuariosFiltradas("Activo", filtroBusqueda);
-                usuariosInactivos = paginacionUtil.getUsuariosXfila(1, "Inactivo");
+                usuariosActivos = usuariosPaginacion.filtroBusquedaUsuario("Activo", filtroBusqueda, page);
+                cantidadFilasActivos = usuariosPaginacion.getCantidadFilasUsuariosFiltradas("Activo", filtroBusqueda);
+                usuariosInactivos = usuariosPaginacion.getUsuariosXfila(1, "Inactivo");
                 if (cantidadFilasActivos == 0) {
                     model.addAttribute("noDatosFiltroActivo", "No se encontraron coincidencias.");
                 }
             }
             else {
-                usuariosInactivos = paginacionUtil.filtroBusquedaUsuario("Inactivo", filtroBusqueda, page);
-                cantidadFilasInactivos = paginacionUtil.getCantidadFilasUsuariosFiltradas("Inactivo", filtroBusqueda);
-                usuariosActivos = paginacionUtil.getUsuariosXfila(1, "Activo");
+                usuariosInactivos = usuariosPaginacion.filtroBusquedaUsuario("Inactivo", filtroBusqueda, page);
+                cantidadFilasInactivos = usuariosPaginacion.getCantidadFilasUsuariosFiltradas("Inactivo", filtroBusqueda);
+                usuariosActivos = usuariosPaginacion.getUsuariosXfila(1, "Activo");
                 if (cantidadFilasInactivos == 0) {
                     model.addAttribute("noDatosFiltroInactivo", "No se encontraron coincidencias.");
                 }
