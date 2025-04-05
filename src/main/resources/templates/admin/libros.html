@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Libros</title>
+    <link rel="stylesheet" th:href="@{/admin/libros_estilos.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 id="title-libros" class="mt-2">Libros</h1>
+
+            <!-- Vista Lista de Libros -->
+            <div id="lista-libros">
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${librosActivos.size()}"
+                                th:data-inactivos="${librosInactivos.size()}"
+                                th:style="${(librosActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/libros}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/libros'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5 d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="btn-add-libro" data-bs-toggle="modal" data-bs-target="#addLibroModal">
+                            <i class="bi bi-book"></i>&nbsp;
+                            Nuevo Libro
+                        </button>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <div class="col-10">
+                            <select class="form-select" id="view-filter-lst">
+                                <option value="1" th:selected="${estado == 'Activo'}">Libros Habilitados</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Libros Inhabilitados</option>
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="col-2" id="seleccionActInact"></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+
+                    <div id="tablaActivos" class="LibrosActivos" th:if="${librosActivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titulo</th>
+                                    <th>Categoria</th>
+                                    <th>Editorial</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="libro : ${librosActivos}">
+                                    <td th:text="${libro.idLibro}"></td>
+                                    <td th:text="${libro.titulo}"></td>
+                                    <td th:text="${libro.categoria.categoria}"></td>
+                                    <td th:text="${libro.editorial.editorial}"></td>
+                                    <td>
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#verDatosLibro"
+                                            th:data-idLibro="${libro.idLibro}"
+                                            th:data-titulo="${libro.titulo}"
+                                            th:data-nombreCategoria="${libro.categoria.categoria}"
+                                            th:data-nombreEditorial="${libro.editorial.editorial}"
+                                            th:data-nombreAutor="${libro.autor.autor}"
+                                            th:data-anioPublic="${libro.anioPublicacion}"
+                                            th:data-descripcion="${libro.descripcion}"
+                                            th:data-estado="${libro.estado}"
+                                            th:data-foto="|data:image/png;base64,${libro.fotoBase64}|"
+                                            >
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button id="btn-editLibro" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editLibroModal"
+                                            th:data-idLibro="${libro.idLibro}"
+                                            th:data-titulo="${libro.titulo}"
+                                            th:data-idCategoria="${libro.categoria.idCategoria}"
+                                            th:data-idEditorial="${libro.editorial.idEditorial}"
+                                            th:data-idAutor="${libro.autor.idAutor}"
+                                            th:data-anioPublic="${libro.anioPublicacion}"
+                                            th:data-descripcion="${libro.descripcion}"
+                                            th:data-estado="${libro.estado}"
+                                            th:data-foto="|data:image/png;base64,${libro.fotoBase64}|"
+                                            >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dissableModal"
+                                            th:data-idLibro="${libro.idLibro}"
+                                            th:data-titulo="${libro.titulo}"
+                                            >
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de libros activos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/libros'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div id="tablaInactivos" class="LibrosInactivos" th:if="${librosInactivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titulo</th>
+                                    <th>Categoria</th>
+                                    <th>Editorial</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="libro : ${librosInactivos}">
+                                    <td th:text="${libro.idLibro}"></td>
+                                    <td th:text="${libro.titulo}"></td>
+                                    <td th:text="${libro.categoria.categoria}"></td>
+                                    <td th:text="${libro.editorial.editorial}"></td>
+                                    <td>
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#verDatosLibro"
+                                            th:data-idLibro="${libro.idLibro}"
+                                            th:data-titulo="${libro.titulo}"
+                                            th:data-nombreCategoria="${libro.categoria.categoria}"
+                                            th:data-nombreEditorial="${libro.editorial.editorial}"
+                                            th:data-nombreAutor="${libro.autor.autor}"
+                                            th:data-anioPublic="${libro.anioPublicacion}"
+                                            th:data-descripcion="${libro.descripcion}"
+                                            th:data-estado="${libro.estado}"
+                                            th:data-foto="|data:image/png;base64,${libro.fotoBase64}|"
+                                            >
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#habilitarModal"
+                                            th:data-idLibro="${libro.idLibro}"
+                                            th:data-titulo="${libro.titulo}"
+                                            >
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de libros inactivos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/libros'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="LibrosActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No hay libros habilitados.</p>
+                        <p class="LibrosInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No hay libros inhabilitados.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Modal para visualizar datos de libro -->
+            <div class="modal fade" id="verDatosLibro" tabindex="-1" aria-labelledby="verDatosLibroLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="verDatosLibroLabel">
+                                <i class="bi bi-book"></i> Detalles del Libro
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <!-- Página 1: Imagen e información básica -->
+                            <div id="pagina1" class="row">
+                                <!-- Imagen a la izquierda -->
+                                <div class="col-md-6 d-flex align-items-center justify-content-center">
+                                    <img id="imgLibro" src="" alt="imagen-libro" class="img-fluid imagen-libro">
+                                </div>
+                                <!-- Texto a la derecha -->
+                                <div class="col-md-6 contenido-libro">
+                                    <strong>Título:</strong>
+                                    <p id="modal-titulo"></p>
+                                    <strong>Descripción:</strong>
+                                    <p id="modal-descripcion"></p>
+                                </div>
+                            </div>
+                    
+                            <!-- Página 2: Detalles adicionales -->
+                            <div id="pagina2" class="container-fluid">
+                                <div class="row text-center mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-uppercase text-secondary">Autor</h6>
+                                        <p id="modal-autor" class="mb-0"></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-uppercase text-secondary">Editorial</h6>
+                                        <p id="modal-editorial" class="mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="row text-center mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-uppercase text-secondary">Categoría</h6>
+                                        <p id="modal-categoria" class="mb-0"></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-uppercase text-secondary">Año de Publicación</h6>
+                                        <p id="modal-anioPublic" class="mb-0"></p>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-md-6 mb-3">
+                                        <h6 class="text-uppercase text-secondary">Estado</h6>
+                                        <p id="modal-estado" class="mb-0"></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-uppercase text-secondary">Archivo de Libro</h6>
+                                        <a id="descargaLibro" href="#" class="btn btn-success">
+                                            Descargar <i class="bi bi-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="modal-footer">
+                            <div id="divVolverView">
+                                <button id="btnVolverView" type="button" class="btn btn-primary">
+                                    <i class="bi bi-arrow-left"></i>&nbsp;Volver
+                                </button>
+                            </div>
+                            <div id="divVerMasView">
+                                <button id="btnVerMasView" type="button" class="btn btn-primary">
+                                    Ver más&nbsp;<i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para agregar libro -->
+            <div class="modal fade" id="addLibroModal" tabindex="-1" aria-labelledby="addLibroModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+              
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addLibroModalLabel">
+                                <i class="bi bi-book"></i> Detalles del Libro
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+              
+                        <form id="formAgregarLibro" th:action="@{/libros/agregar-libro}" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <!-- Columna 1: Solo imagen -->
+                                        <div class="col-md-4 d-flex flex-column align-items-center">
+                                            <div class="mb-3 text-center">
+                                                <!-- Imagen con estilos para que se ajuste al contenedor -->
+                                                <img id="imgLibroAdd" src="#" alt="imagen-libro" class="img-fluid mb-3" style="width: 100%; max-width: 300px; height: auto; object-fit: contain;">
+                                                <label for="imagenLibro" class="form-label"><strong>Imagen del libro</strong></label>
+                                                <input type="file" class="form-control" id="imagenLibro" name="archivoImagenLibro" accept="image/*">
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Columna 2: Título y Descripción -->
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="modal-titulo-add" class="form-label"><strong>Título:</strong></label>
+                                                <input type="text" class="form-control" name="titulo" id="modal-titulo-add">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-descripcion-add" class="form-label"><strong>Descripción:</strong></label>
+                                                <textarea class="form-control" name="descripcion" id="modal-descripcion-add" rows="16"></textarea>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Columna 3: Detalles adicionales y archivo -->
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="modal-autor-add" class="form-label"><strong>Autor</strong></label>
+                                                <select class="form-select" name="idAutor" id="modal-autor-add">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="autor : ${autores}" th:value="${autor.idAutor}" th:text="${autor.autor}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-editorial-add" class="form-label"><strong>Editorial</strong></label>
+                                                <select class="form-select" name="idEditorial" id="modal-editorial-add">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="editorial : ${editoriales}" th:value="${editorial.idEditorial}" th:text="${editorial.editorial}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-categoria-add" class="form-label"><strong>Categoría</strong></label>
+                                                <select class="form-select" name="idCategoria" id="modal-categoria-add">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="categoria : ${categorias}" th:value="${categoria.idCategoria}" th:text="${categoria.categoria}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-anioPublic-add" class="form-label"><strong>Año de Publicación</strong></label>
+                                                <input type="number" class="form-control" name="anioPublicacion" id="modal-anioPublic-add">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="archivoLibro" class="form-label"><strong>Archivo de Libro</strong></label>
+                                                <input type="file" class="form-control" name="archivoLibro" id="archivoLibro">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">
+                                    Guardar Libro
+                                </button>
+                            </div>
+                        </form>
+              
+                  </div>
+                </div>
+            </div>
+
+            <!-- Modal para editar libro -->
+            <div class="modal fade" id="editLibroModal" tabindex="-1" aria-labelledby="editLibroModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+              
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editLibroModalLabel">
+                                <i class="bi bi-book"></i> Detalles del Libro
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+              
+                        <form id="formEditarLibro" th:action="@{/libros/editar-libro}" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <!-- Columna 1: Solo imagen -->
+                                        <div class="col-md-4 d-flex flex-column align-items-center">
+                                            <div class="mb-3 text-center">
+                                                <input type="hidden" name="idLibro" id="modal-idLibro-edit">
+                                                <!-- Imagen con estilos para que se ajuste al contenedor -->
+                                                <img id="imgLibroEdit" src="#" alt="imagen-libro" class="img-fluid mb-3" style="width: 100%; max-width: 300px; height: auto; object-fit: contain;">
+                                                <div>
+                                                    <label for="imagenLibroEdit" class="form-label"><strong>Imagen del libro</strong></label>
+                                                    <select class="form-select mb-2" name="imagenLibroSelector" id="imagenLibroSelector">
+                                                        <option value="1" selected>Mantener la misma imagen</option>
+                                                        <option value="2">Cambiar imagen del libro</option>
+                                                    </select>
+                                                    <input type="file" class="form-control" id="imagenLibroEdit" name="archivoImagenLibro" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Columna 2: Título y Descripción -->
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="modal-titulo-edit" class="form-label"><strong>Título:</strong></label>
+                                                <input type="text" class="form-control" name="titulo" id="modal-titulo-edit">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-descripcion-edit" class="form-label"><strong>Descripción:</strong></label>
+                                                <textarea class="form-control" name="descripcion" id="modal-descripcion-edit" rows="16"></textarea>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Columna 3: Detalles adicionales y archivo -->
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="modal-autor-edit" class="form-label"><strong>Autor</strong></label>
+                                                <select class="form-select" name="idAutor" id="modal-autor-edit">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="autor : ${autores}" th:value="${autor.idAutor}" th:text="${autor.autor}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-editorial-edit" class="form-label"><strong>Editorial</strong></label>
+                                                <select class="form-select" name="idEditorial" id="modal-editorial-edit">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="editorial : ${editoriales}" th:value="${editorial.idEditorial}" th:text="${editorial.editorial}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-categoria-edit" class="form-label"><strong>Categoría</strong></label>
+                                                <select class="form-select" name="idCategoria" id="modal-categoria-edit">
+                                                    <option value="">Seleccione</option>
+                                                    <option th:each="categoria : ${categorias}" th:value="${categoria.idCategoria}" th:text="${categoria.categoria}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="modal-anioPublic-edit" class="form-label"><strong>Año de Publicación</strong></label>
+                                                <input type="number" class="form-control" name="anioPublicacion" id="modal-anioPublic-edit">
+                                            </div>
+                                            <!-- Adicional -->
+                                            <div class="mb-3">
+                                                <label for="archivoLibroEdit" class="form-label"><strong>Archivo de Libro</strong></label>
+                                                <select class="form-select mb-2" name="archivoLibroSelector" id="archivoLibroSelector">
+                                                    <option value="1" selected>Mantener el mismo archivo</option>
+                                                    <option value="2">Cambiar archivo del libro</option>
+                                                </select>
+                                                <input type="file" class="form-control" name="archivoLibro" id="archivoLibroEdit">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">
+                                    Actualizar Libro
+                                </button>
+                            </div>
+                        </form>
+
+                  </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de error validacion form -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastMessage"></div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para deshabilitar libro -->
+            <div class="modal fade" id="dissableModal" tabindex="-1" aria-labelledby="dissableModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-book"></i> Deshabilitar Libro</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer deshabilitar el libro <strong id="libroName"></strong>?</p>
+                            <p class="text-muted">Nota: El libro no se podrá visualizar en el catálogo.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/libros/cambiar-estado}" method="post">
+                                <input type="hidden" id="idLibroDissable" name="idLibro">
+                                <button type="submit" class="btn btn-danger">Sí, quiero deshabilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              
+            <!-- Modal para habilitar libro -->
+            <div class="modal fade" id="habilitarModal" tabindex="-1" aria-labelledby="habilitarModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-book"></i> Habilitar Libro</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer habilitar el libro <strong id="libroName2"></strong>?</p>
+                            <p class="text-muted">Nota: El libro podrá visualizarse nuevamente en el catálogo.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/libros/cambiar-estado}" method="post">
+                                <input type="hidden" id="idLibroEnable" name="idLibro">
+                                <button type="submit" class="btn btn-primary">Sí, quiero habilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script th:src="@{/admin/libros_script.js}"></script>
+</body>
+</html>

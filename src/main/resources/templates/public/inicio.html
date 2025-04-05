@@ -37,17 +37,18 @@
 
         <div id="libros-recientes" th:if="${librosRecientes}">
             <div class="container my-5">
-                <h2 class="text-center mb-3 fw-bold">Libros Recientemente Subidos</h2>
-                    <!-- Inicio Card -->
-                    <div class="row" th:each="libro : ${librosRecientes}">
-                        <div class="card col-3 cover-libros">
+                <h2 class="text-center mb-4 fw-bold">Libros Recientemente Subidos</h2>
+                <!-- Inicio de Cards en una sola fila -->
+                <div class="row">
+                    <div class="col-3" th:each="libro : ${librosRecientes}">
+                        <div class="card cover-libros">
                             <a href="#">
-                                <img th:src="'data:image/jpeg;base64,' + ${libro.fotoBase64}" 
-                                 class="card-img-top libro-imagen" alt="Imagen del libro">
+                                <img th:src="'data:image/jpeg;base64,' + ${libro.fotoBase64}" class="card-img-top libro-imagen" alt="imagen-libro">
                             </a>
                         </div>
                     </div>
-                    <!-- Fin Card -->
+                </div>
+                <!-- Fin de Cards -->
             </div>
         </div>
 

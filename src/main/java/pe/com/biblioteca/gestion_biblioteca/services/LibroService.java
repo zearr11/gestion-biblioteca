@@ -21,27 +21,20 @@ public class LibroService {
     }
 
     public Libro create(Libro entity) { // Crea el libro
-        // Falta implementar
         entity.setEstado("Activo");
         return this.libroRepository.saveAndFlush(entity);
     }
 
     public Libro update(Libro entity) { // Actualiza todos sus datos
-        // Falta implementar
-        Libro libroToUpdate = this.findById(entity.getIdLibro());
+        return this.libroRepository.saveAndFlush(entity);
+    }
 
-        if (libroToUpdate == null) return null;
-
-        libroToUpdate.setAnioPublicacion(entity.getAnioPublicacion());
-        libroToUpdate.setArchivoFoto(entity.getArchivoFoto());
-        libroToUpdate.setArchivoLibro(entity.getArchivoLibro());
-        libroToUpdate.setAutor(entity.getAutor());
-        libroToUpdate.setCategoria(entity.getCategoria());
-        libroToUpdate.setDescripcion(entity.getDescripcion());
-        libroToUpdate.setEditorial(entity.getEditorial());
-        libroToUpdate.setTitulo(entity.getTitulo());
-
-        return this.libroRepository.saveAndFlush(libroToUpdate);
+    public Libro enableDissable(Long id) { // Solo actualiza su estado (Simula la eliminacion)
+        Libro libroToDelete = this.findById(id);
+        if (libroToDelete == null) return null;
+        String state = (libroToDelete.getEstado().equals("Activo")) ? "Inactivo" : "Activo";
+        libroToDelete.setEstado(state);
+        return this.libroRepository.saveAndFlush(libroToDelete);
     }
 
 }

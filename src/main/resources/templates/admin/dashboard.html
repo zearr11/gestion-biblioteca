@@ -9,6 +9,7 @@
     <div th:replace="~{admin/master-page :: layout}">
         <div th:fragment="content">
             <h1 class="mt-2">Dashboard</h1>
+            <hr>
             <div class="row mt-3">
                 <!-- Tarjeta Usuario -->
                 <div class="col-md-3 mb-3" th:if="${esAdmin}">
@@ -51,9 +52,11 @@
                     <div class="card">
                         <div class="card-body row">
                             <div class="col-5">
-                                <div id="icon3">
-                                    <i class="bi bi-book fs-1"></i>
-                                </div>
+                                <a th:href="@{/libros}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon3">
+                                        <i class="bi bi-book fs-1"></i>
+                                    </div>
+                                </a>
                             </div>
                             <div class="col-7">
                                 <h5 class="card-title">Libros</h5>
@@ -111,6 +114,7 @@
                     </div>
                 </div>
             </div>
+            <hr>
         </div>
     </div>
     <script th:src="@{/admin/dashboard_script.js}"></script>
