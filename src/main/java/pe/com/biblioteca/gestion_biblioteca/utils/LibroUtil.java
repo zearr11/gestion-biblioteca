@@ -2,7 +2,9 @@ package pe.com.biblioteca.gestion_biblioteca.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pe.com.biblioteca.gestion_biblioteca.dtos.LibroDTO;
@@ -32,7 +34,9 @@ public class LibroUtil {
     }
 
     public List<Libro> ultimos4Libros() {
-        List<Libro> allLibros = this.libroService.findAll();
+        List<Libro> allLibros = this.libroService.findAll().stream()
+                                .filter(libro -> libro.getEstado().equals("Activo"))
+                                .collect(Collectors.toList());
         if (allLibros.isEmpty()) {
             return new ArrayList<>();
         }
@@ -122,6 +126,14 @@ public class LibroUtil {
 
     public void cambiarEstadoLibro(Long id) {
         this.libroService.enableDissable(id);
+    }
+
+    public List<Integer> aniosPublicacion() {
+        return this.libroService.findAll().stream()
+                .map(Libro::getAnioPublicacion)
+                .distinct()
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
     }
 
 }

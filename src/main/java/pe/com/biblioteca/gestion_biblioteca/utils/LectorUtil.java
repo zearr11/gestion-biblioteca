@@ -1,12 +1,15 @@
 package pe.com.biblioteca.gestion_biblioteca.utils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import pe.com.biblioteca.gestion_biblioteca.dtos.UsuarioDTO;
+import pe.com.biblioteca.gestion_biblioteca.models.Persona;
 import pe.com.biblioteca.gestion_biblioteca.models.Usuario;
+import pe.com.biblioteca.gestion_biblioteca.services.PersonaService;
 import pe.com.biblioteca.gestion_biblioteca.services.UsuarioService;
 
 @Component
@@ -14,6 +17,19 @@ public class LectorUtil {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private PersonaService personaService;
+
+    // Registrar Nuevo Lector
+    public void agregarNuevoLector(UsuarioDTO entity) {
+        Persona personaToSave = new Persona(null, entity.getNombres(), entity.getApellidos(), entity.getTipoDoc(),
+                                            entity.getNumeroDoc(), entity.getGenero(), entity.getCorreo(),
+                                            LocalDate.now(), null);
+        Usuario usuarioToSave = new Usuario(null, entity.getUsername(), entity.getContrasenia(),
+                                            "LECTOR", "Activo", null);
+        usuarioToSave.setPersona(this.personaService.create(personaToSave));
+        this.usuarioService.create(usuarioToSave);
+    }
 
     // Modificar lector sin contraseña
     public void modificarLector(UsuarioDTO entity) {

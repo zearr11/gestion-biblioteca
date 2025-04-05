@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import pe.com.biblioteca.gestion_biblioteca.dtos.UsuarioDTO;
 import pe.com.biblioteca.gestion_biblioteca.models.Usuario;
 import pe.com.biblioteca.gestion_biblioteca.paginations.LectoresPaginacion;
 import pe.com.biblioteca.gestion_biblioteca.services.AuthService;
 import pe.com.biblioteca.gestion_biblioteca.utils.LectorUtil;
+
 
 
 @Controller
@@ -83,6 +86,19 @@ public class LectorController {
         model.addAttribute("esAdmin", ("ROLE_ADMIN".equals(authService.getRol())));
 
         return "admin/lectores";
+    }
+
+    @GetMapping("/registro")
+    public String vistaRegistro(Model model) {
+        return "public/registro-lector";
+    }
+
+    @PostMapping("/registro-lector")
+    public String registroLector(@ModelAttribute UsuarioDTO usuarioModel,
+                                 RedirectAttributes redirectAttributes) {
+        this.lectorUtil.agregarNuevoLector(usuarioModel);
+        redirectAttributes.addFlashAttribute("cuentaCreada", "¡Registro de cuenta exitoso!");
+        return "redirect:/login";
     }
 
     @PostMapping("/modificar-lector")

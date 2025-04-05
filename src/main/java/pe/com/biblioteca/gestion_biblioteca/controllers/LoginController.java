@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LoginController {
 
     @GetMapping()
-    public String verLogin(@RequestParam(value = "error", required = false) String error, Model model) {
+    public String verLogin(@RequestParam(value = "error", required = false) String error, 
+                            Model model) {
 
         if ("invalido".equals(error)) {
             model.addAttribute("loginError", "Usuario y/o contraseña inválidos.");

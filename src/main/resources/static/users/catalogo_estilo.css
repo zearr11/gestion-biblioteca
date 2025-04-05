@@ -1,0 +1,45 @@
+.book-card img {
+    height: 300px;
+    object-fit: cover;
+}
+
+#titulo-catalogo {
+    background: url('../img/fondo-catalogo.jpg') no-repeat center center/cover;
+    background-size: cover;
+    background-position: center;
+    height: 150px;
+    position: relative;
+    color: #fff;
+}
+
+#titulo-fondo {
+    position: absolute;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+
+    background: rgba(0, 0, 0, 0.623);
+    padding: 18px;
+    padding-right: 50px;
+    padding-left: 50px;
+    border-radius: 10px;
+
+    top: 50%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+}
+
+.card-libro .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+}
+
+.card-libro .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+.enlacesLibros {
+    color: transparent;
+}
