@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Editorial</title>
+    <link rel="stylesheet" th:href="@{/admin/editorial_estilos.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 id="title-editorial" class="mt-2">Editoriales</h1>
+
+            <!-- Vista Lista Editoriales -->
+            <div id="lista-editorial">
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${EditorialesActivos.size()}"
+                                th:data-inactivos="${EditorialesInactivos.size()}"
+                                th:style="${(EditorialesActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/editoriales}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/editoriales'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5 d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="btn-add-editorial" data-bs-toggle="modal" data-bs-target="#addEditorialModal">
+                            <i class="bi bi-buildings-fill"></i> Nueva Editorial
+                        </button>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <div class="col-10">
+                            <select class="form-select" id="view-filter-lst">
+                                <option value="1" th:selected="${estado == 'Activo'}">Editoriales Habilitados</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Editoriales Inhabilitados</option>
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="col-2" id="seleccionActInact"></div>
+                    </div>
+                </div>
+                <hr>
+                <!---->
+                <div class="text-center">
+
+                    <div id="tablaEditorialesActivos" class="editorialesActivos" th:if="${EditorialesActivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Editorial</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="editorial : ${EditorialesActivos}">
+                                    <td th:text="${editorial.idEditorial}"></td>
+                                    <td th:text="${editorial.editorial}"></td>
+                                    <td th:text="${editorial.estado}"></td>
+                                    <td>
+                                        <button id="btn-editEditorial" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editEditorialModal"
+                                            th:data-idEditorial="${editorial.idEditorial}"
+                                            th:data-editorial="${editorial.editorial}"
+                                            th:data-estado="${editorial.estado}"
+                                            >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dissableModal"
+                                            th:data-idEditorial="${editorial.idEditorial}"
+                                            th:data-editorial="${editorial.editorial}"
+                                            >
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/editoriales'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div id="tablaInactivos" class="editorialesInactivos" th:if="${EditorialesInactivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Editorial</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="editorial : ${EditorialesInactivos}">
+                                    <td th:text="${editorial.idEditorial}"></td>
+                                    <td th:text="${editorial.editorial}"></td>
+                                    <td th:text="${editorial.estado}"></td>
+                                    <td>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#habilitarModal"
+                                            th:data-idEditorial="${editorial.idEditorial}"
+                                            th:data-editorial="${editorial.editorial}"
+                                            >
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/editoriales'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="editorialesActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No se encontraron editoriales habilitados.</p>
+                        <p class="editorialesInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No se encontraron editoriales inhabilitados.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Modal para agregar editorial -->
+            <div class="modal fade" id="addEditorialModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addEditorialModalLabel">Agregar Editorial</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="formAgregarEditorial" th:action="@{/editoriales/agregar-editorial}" method="post">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="mb-2">
+                                        <label for="editorial-add" class="form-label">Editorial:</label>
+                                        <input type="text" placeholder="Ingresa una editorial" class="form-control" name="editorial" id="editorial-add" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <div class="container-fluid d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-3" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Guardar Editorial</button>
+                                </div>
+                            </div>
+                        </form>     
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para editar editorial -->
+            <div class="modal fade" id="editEditorialModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editEditorialModalLabel">Modificar Editorial</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="formEditarEditorial" th:action="@{/editoriales/editar-editorial}" method="post">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <input type="hidden" name="idEditorial" id="idEditorialEdit">
+                                    <div class="mb-2">
+                                        <label for="editorial-edit" class="form-label">Editorial:</label>
+                                        <input type="text" placeholder="Ingresa una editorial" class="form-control" name="editorial" id="editorial-edit" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <div class="container-fluid d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-3" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Actualizar Editorial</button>
+                                </div>
+                            </div>
+                        </form>     
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de error validacion form -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastMessage"></div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para deshabilitar editorial -->
+            <div class="modal fade" id="dissableModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Deshabilitar Editorial</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer deshabilitar la editorial <strong id="editorialName"></strong>?</p>
+                            <p class="text-muted">Nota: La editorial no podrá asignarse a ningún libro mientras este deshabilitado.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/editoriales/cambiar-estado}" method="post">
+                                <input type="hidden" id="idEditorialDissable" name="idEditorial">
+                                <button type="submit" class="btn btn-danger">Sí, quiero deshabilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para habilitar editorial -->
+            <div class="modal fade" id="habilitarModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Habilitar Editorial</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer habilitar la editorial <strong id="editorialName2"></strong>?</p>
+                            <p class="text-muted">Nota: La editorial podrá ser usada nuevamente al registrar/modificar libros.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/editoriales/cambiar-estado}" method="post">
+                                <input type="hidden" id="idEditorialEnable" name="idEditorial">
+                                <button type="submit" class="btn btn-primary">Sí, quiero habilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIGUE AQUI -->
+
+        </div>
+    </div>
+    <script th:src="@{/admin/editorial_script.js}"></script>
+</body>
+</html>

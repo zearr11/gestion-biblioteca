@@ -1,0 +1,14 @@
+main {
+    background: whitesmoke;
+}
+
+.img-fixed {
+    width: 400px;
+    height: 600px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.vista-libro-completa {
+    padding: 40px 60px 40px 60px;
+}

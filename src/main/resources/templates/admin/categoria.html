@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Categoria</title>
+    <link rel="stylesheet" th:href="@{/admin/categoria_estilos.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 id="title-categoria" class="mt-2">Categorias</h1>
+
+            <!-- Vista Lista Categorias -->
+            <div id="title-categoria">
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${CategoriasActivos.size()}"
+                                th:data-inactivos="${CategoriasInactivos.size()}"
+                                th:style="${(CategoriasActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/categorias}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/categorias'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5 d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="btn-add-categoria" data-bs-toggle="modal" data-bs-target="#addCategoriaModal">
+                            <i class="bi bi-tags-fill"></i> Nueva Categoria
+                        </button>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <div class="col-10">
+                            <select class="form-select" id="view-filter-lst">
+                                <option value="1" th:selected="${estado == 'Activo'}">Categorias Habilitadas</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Categorias Inhabilitadas</option>
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="col-2" id="seleccionActInact"></div>
+                    </div>
+                </div>
+                <hr>
+                <!---->
+                <div class="text-center">
+
+                    <div id="tablaActivos" class="categoriasActivos" th:if="${CategoriasActivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Categoria</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="categoria : ${CategoriasActivos}">
+                                    <td th:text="${categoria.idCategoria}"></td>
+                                    <td th:text="${categoria.categoria}"></td>
+                                    <td th:text="${categoria.estado}"></td>
+                                    <td>
+                                        <button id="btn-editCategoria" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editCategoriaModal"
+                                            th:data-idCategoria="${categoria.idCategoria}"
+                                            th:data-categoria="${categoria.categoria}"
+                                            th:data-estado="${categoria.estado}"
+                                            >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dissableModal"
+                                            th:data-idCategoria="${categoria.idCategoria}"
+                                            th:data-categoria="${categoria.categoria}"
+                                            >
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/categorias'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div id="tablaInactivos" class="categoriasInactivos" th:if="${CategoriasInactivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Categoria</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="categoria : ${CategoriasInactivos}">
+                                    <td th:text="${categoria.idCategoria}"></td>
+                                    <td th:text="${categoria.categoria}"></td>
+                                    <td th:text="${categoria.estado}"></td>
+                                    <td>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#habilitarModal"
+                                            th:data-idCategoria="${categoria.idCategoria}"
+                                            th:data-categoria="${categoria.categoria}"
+                                            >
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/categorias'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="categoriasActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No se encontraron categorias habilitadas.</p>
+                        <p class="categoriasInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No se encontraron categorias inhabilitadas.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Modal para agregar categoria -->
+            <div class="modal fade" id="addCategoriaModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCategoriaModalLabel">Agregar Categoria</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="formAgregar" th:action="@{/categorias/agregar-categoria}" method="post">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="mb-2">
+                                        <label for="categoria-add" class="form-label">Categoría:</label>
+                                        <input type="text" placeholder="Ingresa una categoria" class="form-control" name="categoria" id="categoria-add" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <div class="container-fluid d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-3" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Guardar Categoria</button>
+                                </div>
+                            </div>
+                        </form>     
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para editar categoria -->
+            <div class="modal fade" id="editCategoriaModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCategoriaModalLabel">Modificar Categoria</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="formEditar" th:action="@{/categorias/editar-categoria}" method="post">
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <input type="hidden" name="idCategoria" id="idCategoriaEdit">
+                                    <div class="mb-2">
+                                        <label for="categoria-edit" class="form-label">Categoria:</label>
+                                        <input type="text" placeholder="Ingresa una categoria" class="form-control" name="categoria" id="categoria-edit" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Botones de acción en la parte baja -->
+                            <div class="modal-footer">
+                                <div class="container-fluid d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-3" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-success">Actualizar Categoria</button>
+                                </div>
+                            </div>
+                        </form>     
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de error validacion form -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastMessage"></div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para deshabilitar categoria -->
+            <div class="modal fade" id="dissableModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Deshabilitar Categoria</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer deshabilitar la categoria <strong id="categoriaName"></strong>?</p>
+                            <p class="text-muted">Nota: La categoria no podrá asignarse a ningún libro mientras este deshabilitado.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/categorias/cambiar-estado}" method="post">
+                                <input type="hidden" id="idCategoriaDissable" name="idCategoria">
+                                <button type="submit" class="btn btn-danger">Sí, quiero deshabilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para habilitar categoria -->
+            <div class="modal fade" id="habilitarModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Habilitar Categoria</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer habilitar la categoria <strong id="categoriaName2"></strong>?</p>
+                            <p class="text-muted">Nota: La categoria podrá ser usada nuevamente al registrar/modificar libros.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/categorias/cambiar-estado}" method="post">
+                                <input type="hidden" id="idCategoriaEnable" name="idCategoria">
+                                <button type="submit" class="btn btn-primary">Sí, quiero habilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIGUE AQUI -->
+
+        </div>
+    </div>
+    <script th:src="@{/admin/categoria_script.js}"></script>
+</body>
+</html>

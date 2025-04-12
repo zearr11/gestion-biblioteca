@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/logo.ico}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/admin/master_page_estilo.css}">
+</head>
+<body>
+    <div th:fragment="layout">
+        <div id="wrapper">
+            <div id="sidebar-wrapper">
+                <div class="p-3 text-white fs-5 fw-bold text-center">
+                    <img th:src="@{/img/logo.ico}" alt="Logo" width="50" height="50" class="d-inline-block align-text-top mb-2 mt-2"><br>
+                    BooksFree
+                </div>
+                <div>
+                    <a class="list-group-item btn-actions" hidden></a>
+                    <a th:href="@{/dashboard}" class="list-group-item btn-actions">
+                        <i class="bi bi-speedometer2 icons-btn"></i> Dashboard
+                    </a>
+                    <a th:href="@{/usuarios}" class="list-group-item btn-actions" th:if="${esAdmin}">
+                        <i class="bi bi-people-fill icons-btn"></i> Usuarios
+                    </a>
+                    <a th:href="@{/lectores}" class="list-group-item btn-actions">
+                        <i class="bi bi-eyeglasses icons-btn"></i> Lectores
+                    </a>
+                    <a th:href="@{/libros}" class="list-group-item btn-actions">
+                        <i class="bi bi-book icons-btn"></i> Libros
+                    </a>
+                    <a th:href="@{/autores}" class="list-group-item btn-actions">
+                        <i class="bi bi-pen-fill icons-btn"></i> Autores
+                    </a>
+                    <a th:href="@{/categorias}" class="list-group-item btn-actions">
+                        <i class="bi bi-tags-fill icons-btn"></i> Categorías
+                    </a>
+                    <a th:href="@{/editoriales}" class="list-group-item btn-actions">
+                        <i class="bi bi-buildings-fill icons-btn"></i> Editoriales
+                    </a>
+                    <a class="list-group-item btn-actions" hidden></a>
+                </div>
+            </div>
+
+            <div id="page-content-wrapper" class="flex-fill">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <div class="container-fluid">
+                        <button class="btn btn-dark" id="menu-toggle"><i class="bi bi-filter-left"></i></button>
+                        <a th:href="@{/}" class="btn btn-dark" id="view-inicio"><i class="bi bi-house-fill"></i>Volver a Inicio</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#navbarSupportedContent" 
+                                aria-controls="navbarSupportedContent" 
+                                aria-expanded="false" 
+                                aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/logout}">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="container-fluid mt-4">
+                    <div class="content" th:insert="~{::content}"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

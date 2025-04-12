@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Usuarios</title>
+    <link rel="stylesheet" th:href="@{/admin/usuarios_estilo.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 id="title-usuarios" class="mt-2">Usuarios</h1>
+            
+            <!-- Vista Lista Usuarios -->
+            <div id="lista-usuarios">
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${usuariosActivos.size()}"
+                                th:data-inactivos="${usuariosInactivos.size()}"
+                                th:style="${(usuariosActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/usuarios}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/usuarios'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5 d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="btn-add-usuario" data-bs-toggle="modal" data-bs-target="#addUsuarioModal">
+                            <i class="bi bi-person-plus-fill"></i>&nbsp;
+                            Nuevo Usuario
+                        </button>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <div class="col-10">
+                            <select class="form-select" id="view-filter-lst">
+                                <option value="1" th:selected="${estado == 'Activo'}">Usuarios Habilitados</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Usuarios Inhabilitados</option>
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="col-2" id="seleccionActInact"></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+
+                    <div id="tablaActivos" class="UsuariosActivos" th:if="${usuariosActivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Correo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="usuario : ${usuariosActivos}">
+                                    <td th:text="${usuario.persona.idPersona}"></td>
+                                    <td th:text="${usuario.usuario}"></td>
+                                    <td th:text="${usuario.persona.nombres}"></td>
+                                    <td th:text="${usuario.persona.apellidos}"></td>
+                                    <td th:text="${usuario.persona.correo}"></td>
+                                    <td>
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#verDatosUsuario"
+                                            th:data-id="${usuario.persona.idPersona}"
+                                            th:data-username="${usuario.usuario}"
+                                            th:data-nombres="${usuario.persona.nombres}"
+                                            th:data-apellidos="${usuario.persona.apellidos}"
+                                            th:data-correo="${usuario.persona.correo}"
+                                            th:data-genero="${usuario.persona.genero}"
+                                            th:data-tipoDoc="${usuario.persona.tipoDoc}"
+                                            th:data-numeroDoc="${usuario.persona.numeroDoc}"
+                                            th:data-fechaReg="${usuario.persona.fechaRegistro}"
+                                            th:data-rol="${usuario.rol}"
+                                            th:data-estado="${usuario.estado}"
+                                            >
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button id="btn-editUsuario" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editUsuarioModal"
+                                            th:data-idUsuario="${usuario.idUsuario}"
+                                            th:data-username="${usuario.usuario}"
+                                            th:data-nombres="${usuario.persona.nombres}"
+                                            th:data-apellidos="${usuario.persona.apellidos}"
+                                            th:data-correo="${usuario.persona.correo}"
+                                            th:data-genero="${usuario.persona.genero}"
+                                            th:data-tipoDoc="${usuario.persona.tipoDoc}"
+                                            th:data-numeroDoc="${usuario.persona.numeroDoc}"
+                                            th:data-rol="${usuario.rol}"
+                                            >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dissableModal"
+                                            th:data-idUsuario="${usuario.idUsuario}"
+                                            th:data-nombresCompletos="${usuario.persona.nombres} + ' ' + ${usuario.persona.apellidos}"
+                                            >
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de usuarios activos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/usuarios'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <div id="tablaInactivos" class="UsuariosInactivos" th:if="${usuariosInactivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Correo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="usuario : ${usuariosInactivos}">
+                                    <td th:text="${usuario.persona.idPersona}"></td>
+                                    <td th:text="${usuario.usuario}"></td>
+                                    <td th:text="${usuario.persona.nombres}"></td>
+                                    <td th:text="${usuario.persona.apellidos}"></td>
+                                    <td th:text="${usuario.persona.correo}"></td>
+                                    <td>
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#verDatosUsuario"
+                                            th:data-id="${usuario.persona.idPersona}"
+                                            th:data-username="${usuario.usuario}"
+                                            th:data-nombres="${usuario.persona.nombres}"
+                                            th:data-apellidos="${usuario.persona.apellidos}"
+                                            th:data-correo="${usuario.persona.correo}"
+                                            th:data-genero="${usuario.persona.genero}"
+                                            th:data-tipoDoc="${usuario.persona.tipoDoc}"
+                                            th:data-numeroDoc="${usuario.persona.numeroDoc}"
+                                            th:data-fechaReg="${usuario.persona.fechaRegistro}"
+                                            th:data-rol="${usuario.rol}"
+                                            th:data-estado="${usuario.estado}"
+                                            >
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#habilitarModal"
+                                            th:data-idUsuario="${usuario.idUsuario}"
+                                            th:data-nombresCompletos="${usuario.persona.nombres} + ' ' + ${usuario.persona.apellidos}"
+                                            >
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de usuarios inactivos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/usuarios'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="UsuariosActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No hay otros usuarios habilitados.</p>
+                        <p class="UsuariosInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No hay usuarios inhabilitados.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Modal para visualizar datos de usuario -->
+            <div class="modal fade" id="verDatosUsuario" tabindex="-1" aria-labelledby="verDatosUsuarioLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="verDatosUsuarioLabel"><i class="bi bi-person-circle"></i> Detalles del Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Nombre de Usuario:</strong>
+                                    <p id="modal-username"></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Rol:</strong>
+                                    <p id="modal-rol"></p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Nombres:</strong>
+                                    <p id="modal-nombres"></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Apellidos:</strong>
+                                    <p id="modal-apellidos"></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Correo:</strong>
+                                    <p id="modal-correo"></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Género:</strong>
+                                    <p id="modal-genero"></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Tipo de Documento:</strong>
+                                    <p id="modal-tipoDoc"></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Número de Documento:</strong>
+                                    <p id="modal-numeroDoc"></p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Fecha de Registro:</strong>
+                                    <p id="modal-fechaReg"></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Estado:</strong>
+                                    <p id="modal-estado"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal para Agregar Usuario -->
+            <div class="modal fade" id="addUsuarioModal" tabindex="-1" aria-labelledby="addUsuarioModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <!-- Encabezado del Modal -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addUsuarioModalLabel"><i class="bi bi-person-plus-fill"></i> Nuevo Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <!-- Cuerpo del Modal -->
+                        <div class="modal-body">
+                            <form th:action="@{/usuarios/agregar-usuario}" th:object="${usuarioModel}" method="post" id="form-add-usuario">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Nombres:</label>
+                                        <input type="text" class="form-control" name="nombres" id="nombres" maxlength="50" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Apellidos:</label>
+                                        <input type="text" class="form-control" name="apellidos" id="apellidos" maxlength="50" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Correo:</label>
+                                        <input type="email" class="form-control" name="correo" id="correo" maxlength="100" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Género:</label>
+                                        <select name="genero" id="genero" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Tipo de Documento:</label>
+                                        <select name="tipoDoc" id="tipoDoc" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="DNI">DNI</option>
+                                            <option value="CE">CE</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Número de Documento:</label>
+                                        <input type="text" class="form-control" name="numeroDoc" id="numeroDoc" required pattern="[0-9]{1,20}" maxlength="20" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 20);">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Nombre de Usuario:</label>
+                                        <input type="text" class="form-control" name="username" id="usuario" maxlength="15" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Rol:</label>
+                                        <select name="rol" id="rol" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="ADMIN">Admin</option>
+                                            <option value="USUARIO">Usuario</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Contraseña:</label>
+                                        <input type="password" class="form-control" name="contrasenia" id="contrasenia" maxlength="150" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <ul id="passwordCriteria">
+                                            <li id="lengthCriteria" class="text-danger">Al menos 8 carácteres</li>
+                                            <li id="uppercaseCriteria" class="text-danger">Al menos una letra mayúscula</li>
+                                            <li id="lowercaseCriteria" class="text-danger">Al menos una letra minúscula</li>
+                                            <li id="numberCriteria" class="text-danger">Al menos un número</li>
+                                            <li id="specialCharCriteria" class="text-danger">Al menos un carácter especial (!@#$%^&*...)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 mb-4">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">
+                                        <i class="bi bi-person-x-fill"></i>&nbsp;Cancelar
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-success w-100">
+                                        <i class="bi bi-person-fill-add"></i>&nbsp;Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para Editar Usuario -->
+            <div class="modal fade" id="editUsuarioModal" tabindex="-1" aria-labelledby="editUsuarioModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <!-- Encabezado del Modal -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editUsuarioModalLabel"><i class="bi bi-person-plus-fill"></i> Modificar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <!-- Cuerpo del Modal -->
+                        <div class="modal-body">
+                            <form th:action="@{/usuarios/modificar-usuario}" th:object="${usuarioModel}" method="post" id="form-edit-usuario">
+                                <input type="hidden" name="idUsuario" id="idUsuario">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Nombres:</label>
+                                        <input type="text" class="form-control" name="nombres" id="nombresEdit" maxlength="50" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Apellidos:</label>
+                                        <input type="text" class="form-control" name="apellidos" id="apellidosEdit" maxlength="50" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Correo:</label>
+                                        <input type="email" class="form-control" name="correo" id="correoEdit" maxlength="100" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Género:</label>
+                                        <select name="genero" id="generoEdit" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Tipo de Documento:</label>
+                                        <select name="tipoDoc" id="tipoDocEdit" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="DNI">DNI</option>
+                                            <option value="CE">CE</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Número de Documento:</label>
+                                        <input type="text" class="form-control" name="numeroDoc" id="numeroDocEdit" required pattern="[0-9]{1,20}" maxlength="20" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 20);">
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <div class="col-6">
+                                        <label class="form-label">Nombre de Usuario:</label>
+                                        <input type="text" class="form-control" name="username" id="usuarioEdit" maxlength="15" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Rol:</label>
+                                        <select name="rol" id="rolEdit" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="ADMIN">Admin</option>
+                                            <option value="USUARIO">Usuario</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-3 mb-4">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">
+                                        <i class="bi bi-person-x-fill"></i>&nbsp;Cancelar
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-success w-100">
+                                        <i class="bi bi-person-fill-check"></i>&nbsp;Modificar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de error validacion form -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastMessage"></div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <!-- Modal para deshabilitar usuario -->
+            <div class="modal fade" id="dissableModal" tabindex="-1" aria-labelledby="dissableModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-person-dash-fill"></i> Deshabilitar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer deshabilitar la cuenta del usuario <strong id="usuarioName"></strong>?</p>
+                            <p class="text-muted">Nota: El usuario dejará de tener acceso a la plataforma.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/usuarios/cambiar-estado}" method="post">
+                                <input type="hidden" id="idUsuarioDissable" name="idUsuario">
+                                <button type="submit" class="btn btn-danger">Sí, quiero deshabilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para habilitar usuario -->
+            <div class="modal fade" id="habilitarModal" tabindex="-1" aria-labelledby="habilitarModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-person-fill-down"></i> Habilitar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer habilitar la cuenta del usuario <strong id="usuarioName2"></strong>?</p>
+                            <p class="text-muted">Nota: El usuario podrá acceder nuevamente a la plataforma.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/usuarios/cambiar-estado}" method="post">
+                                <input type="hidden" id="idUsuarioEnable" name="idUsuario">
+                                <button type="submit" class="btn btn-primary">Sí, quiero habilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script th:src="@{/admin/usuarios_script.js}"></script>
+</body>
+</html>

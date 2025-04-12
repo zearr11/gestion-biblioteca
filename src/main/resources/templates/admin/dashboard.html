@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/admin/dashboard_estilos.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 class="mt-2">Dashboard</h1>
+            <hr>
+            <div class="row mt-3">
+                <!-- Tarjeta Usuario -->
+                <div class="col-md-3 mb-3" th:if="${esAdmin}">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/usuarios}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon1">
+                                        <i class="bi bi-people-fill fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Usuarios</h5>
+                                <p class="card-text fs-3" th:text="${totalUsuarios}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta Lectores -->
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/lectores}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon2">
+                                        <i class="bi bi-eyeglasses fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Lectores</h5>
+                                <p class="card-text fs-3" th:text="${totalLectores}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta Libros -->
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/libros}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon3">
+                                        <i class="bi bi-book fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Libros</h5>
+                                <p class="card-text fs-3" th:text="${totalLibros}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta Autores -->
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/autores}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon4">
+                                        <i class="bi bi-pen-fill fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Autores</h5>
+                                <p class="card-text fs-3" th:text="${totalAutores}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta Categorias -->
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/categorias}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon5">
+                                        <i class="bi bi-tags-fill fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Categorias</h5>
+                                <p class="card-text fs-3" th:text="${totalCategorias}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tarjeta Editoriales -->
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body row">
+                            <div class="col-5">
+                                <a th:href="@{/editoriales}" style="color: rgb(31, 31, 31);">
+                                    <div id="icon6">
+                                        <i class="bi bi-buildings-fill fs-1"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h5 class="card-title">Editoriales</h5>
+                                <p class="card-text fs-3" th:text="${totalEditoriales}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+    <script th:src="@{/admin/dashboard_script.js}"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+#seleccionActInact {
+    border-radius: 50px;
+    background: #198754;
+}
+
+.imagen-libro {
+    width: 350px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contenido-libro {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#divVolverView {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    width: 100%;
+}

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/master-page :: head}"></head>
+<head>
+    <title>Autores</title>
+    <link rel="stylesheet" th:href="@{/admin/autores_estilo.css}">
+</head>
+<body>
+    <div th:replace="~{admin/master-page :: layout}">
+        <div th:fragment="content">
+            <h1 id="title-autores" class="mt-2">Autores</h1>
+            
+            <!-- Vista Lista Autores -->
+            <div id="lista-autores">
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div id="buscador" class="col-8"
+                                th:data-activos="${autoresActivos.size()}"
+                                th:data-inactivos="${autoresInactivos.size()}"
+                                th:style="${(autoresActivos.size() > 0) ? 'display: block;' : 'display: none;'}">
+                                <form id="busquedaForm" method="get" th:action="@{/autores}">
+                                    <input type="hidden" name="estado" id="estadoFiltro">
+                                    <input th:value="${filtro}" type="search" id="input-busqueda" class="form-control" name="filtroBusqueda" placeholder="Buscar" required>
+                                </form>
+                            </div>
+                            <div class="col-4">
+                                <a 
+                                    th:href="@{'/autores'(estado=${estado}, filtroBusqueda=${''})}" 
+                                    class="btn btn-primary">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5 d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary" id="btn-add-autores" data-bs-toggle="modal" data-bs-target="#addAutorModal">
+                            <i class="bi bi-pen-fill"></i> Nuevo Autor
+                        </button>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <div class="col-10">
+                            <select class="form-select" id="view-filter-lst">
+                                <option value="1" th:selected="${estado == 'Activo'}">Autores Habilitados</option>
+                                <option value="2" th:selected="${estado == 'Inactivo'}">Autores Inhabilitados</option>
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="col-2" id="seleccionActInact"></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+
+                    <div id="tablaActivos" class="AutoresActivos" th:if="${autoresActivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Autor</th>
+                                    <th>Nacionalidad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="autor : ${autoresActivos}">
+                                    <td th:text="${autor.idAutor}"></td>
+                                    <td th:text="${autor.autor}"></td>
+                                    <td th:text="${autor.nacionalidad}"></td>
+                                    <td th:text="${autor.estado}"></td>
+                                    <td>
+                                        <button id="btn-editAutor" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editAutorModal"
+                                            th:data-idAutor="${autor.idAutor}"
+                                            th:data-autor="${autor.autor}"
+                                            th:data-nacionalidad="${autor.nacionalidad}"
+                                            >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#dissableModal"
+                                            th:data-idAutor="${autor.idAutor}"
+                                            th:data-nombresCompletos="${autor.autor}"
+                                            >
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de autores activos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasActivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/autores'(page=${page}, estado='Activo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div id="tablaInactivos" class="AutoresInactivos" th:if="${autoresInactivos.size() > 0}">
+                        <table class="table">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Autor</th>
+                                    <th>Nacionalidad</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="autor : ${autoresInactivos}">
+                                    <td th:text="${autor.idAutor}"></td>
+                                    <td th:text="${autor.autor}"></td>
+                                    <td th:text="${autor.nacionalidad}"></td>
+                                    <td th:text="${autor.estado}"></td>
+                                    <td>
+                                        
+                                        </button>
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#habilitarModal"
+                                            th:data-idAutor="${autor.idAutor}"
+                                            th:data-nombresCompletos="${autor.autor}"
+                                            >
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <hr>
+                            <nav aria-label="Paginación de autores inactivos">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:each="page : ${#numbers.sequence(1, filasInactivos)}">
+                                        <a class="page-link" 
+                                           th:text="${page}" 
+                                           th:href="@{'/autores'(page=${page}, estado='Inactivo', filtroBusqueda=${filtro})}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="AutoresActivos mt-4" th:if="${filasActivos == 0 and #strings.isEmpty(noDatosFiltroActivo)}">No hay autores habilitados.</p>
+                        <p class="AutoresInactivos mt-4" th:if="${filasInactivos == 0 and #strings.isEmpty(noDatosFiltroInactivo)}">No hay autores inhabilitados.</p>
+                        <p id="sinCoincidenciasActivos" class="sinCoincidenciasActivos mt-4" th:if="${noDatosFiltroInactivo}" th:text="${noDatosFiltroInactivo}">
+                        </p>
+                        <p id="sinCoincidenciasInactivos" class="sinCoincidenciasInactivos mt-4" th:if="${noDatosFiltroActivo}" th:text="${noDatosFiltroActivo}">
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Modal para Agregar Autor -->
+            <div class="modal fade" id="addAutorModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <!-- Encabezado del Modal -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addAutorModalLabel">Nuevo Autor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <!-- Cuerpo del Modal -->
+                        <div class="modal-body">
+                            <form th:action="@{/autores/agregar-autor}" th:object="${autorModel}" method="post" id="form-add-autor">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Autor:</label>
+                                        <input type="text" class="form-control" name="autor" id="autor" placeholder="Ingresa los nombres y apellidos del autor" maxlength="50" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Nacionalidad:</label>
+                                            
+                                            <select name="nacionalidad" id="nacionalidad" class="form-select">
+                                                <option value="">Seleccione</option>
+                                                <option value="Estados Unidos">Estados Unidos</option>
+                                                <option value="China">China</option>
+                                                <option value="Peru">Perú</option>
+                                                <option value="Mexico">México</option>
+                                                <option value="Colombia">Colombia</option>
+                                                <option value="Argentina">Argentina</option>
+                                                <option value="España">España</option>
+                                                <option value="Alemania">Alemania</option>
+                                                <option value="Francia">Francia</option>
+                                                <option value="Italia">Italia</option>
+                                                <option value="Brasil">Brasil</option>
+                                                <option value="Canada">Canadá</option>
+                                                <option value="Chile">Chile</option>
+                                                <option value="Japon">Japón</option>
+                                                <option value="India">India</option>
+                                                <option value="Australia">Australia</option>
+                                                <option value="Rusia">Rusia</option>
+                                                <option value="Reino Unido">Reino Unido</option>
+                                                <option value="Sudafrica">Sudáfrica</option>
+                                                <option value="Egipto">Egipto</option>
+                                                <option value="Portugal">Portugal</option>
+                                                <option value="Uruguay">Uruguay</option>
+                                                <option value="Irlanda">Irlanda</option>
+                                            </select>
+                                          
+                                    </div>
+                                </div>
+                                <div class="row mt-4 mb-2">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-success w-100">
+                                            Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para Editar Autor -->
+            <div class="modal fade" id="editAutorModal" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                        <!-- Encabezado del Modal -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editAutorModalLabel">Modificar Autor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <!-- Cuerpo del Modal -->
+                        <div class="modal-body">
+                            
+                            <form th:action="@{/autores/modificar-autor}" th:object="${autorModel}" method="post" id="form-edit-autor">
+                                <input type="hidden" name="idAutor" id="idAutor">
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Autor:</label>
+                                        <input type="text" class="form-control" name="autor" id="autorEdit" placeholder="Ingresa los nombres y apellidos del autor" maxlength="50" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Nacionalidad:</label>
+                                        
+                                        <select name="nacionalidad" id="nacionalidadEdit" class="form-select">
+                                            <option value="">Seleccione</option>
+                                            <option value="Estados Unidos">Estados Unidos</option>
+                                            <option value="China">China</option>
+                                            <option value="Peru">Perú</option>
+                                            <option value="Mexico">México</option>
+                                            <option value="Colombia">Colombia</option>
+                                            <option value="Argentina">Argentina</option>
+                                            <option value="España">España</option>
+                                            <option value="Alemania">Alemania</option>
+                                            <option value="Francia">Francia</option>
+                                            <option value="Italia">Italia</option>
+                                            <option value="Brasil">Brasil</option>
+                                            <option value="Canada">Canadá</option>
+                                            <option value="Chile">Chile</option>
+                                            <option value="Japon">Japón</option>
+                                            <option value="India">India</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="Rusia">Rusia</option>
+                                            <option value="Reino Unido">Reino Unido</option>
+                                            <option value="Sudafrica">Sudáfrica</option>
+                                            <option value="Egipto">Egipto</option>
+                                            <option value="Portugal">Portugal</option>
+                                            <option value="Uruguay">Uruguay</option>
+                                            <option value="Irlanda">Irlanda</option>
+                                        </select>
+                                    
+                                </div>
+
+                                <div class="row mt-4 mb-2">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-success w-100">
+                                            Modificar
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje de error validacion form -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastMessage"></div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para deshabilitar autor -->
+            <div class="modal fade" id="dissableModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Deshabilitar Autor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer deshabilitar al autor <strong id="autorName"></strong>?</p>
+                            <p class="text-muted">Nota: El autor no podrá asignarse a ningún libro mientras este deshabilitado.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/autores/cambiar-estado}" method="post">
+                                <input type="hidden" id="idAutorDissable" name="idAutor">
+                                <button type="submit" class="btn btn-danger">Sí, quiero deshabilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para habilitar autor -->
+            <div class="modal fade" id="habilitarModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Habilitar Autor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>¿Estás seguro de querer habilitar al autor <strong id="autorName2"></strong>?</p>
+                            <p class="text-muted">Nota: El autor podrá ser usado nuevamente al registrar/modificar libros.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <form th:action="@{/autores/cambiar-estado}" method="post">
+                                <input type="hidden" id="idAutorEnable" name="idAutor">
+                                <button type="submit" class="btn btn-primary">Sí, quiero habilitarlo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script th:src="@{/admin/autores_script.js}"></script>
+</body>
+</html>

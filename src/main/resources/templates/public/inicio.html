@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org/">
+<head th:replace="~{users/master-page :: head-mp}"></head>
+<head>
+    <title>BooksFree - Inicio</title>
+    <link rel="stylesheet" th:href="@{/public/inicio_estilo.css}">
+</head>
+<body>
+    <header th:replace="~{users/master-page :: header-navbar}"></header>
+
+    <main>
+        
+        <div class="img-inicio">
+            <div class="header-text">
+                <h1>¡Bienvenido a BooksFree!</h1>
+                <p>
+                    Descubre un universo de conocimiento con nuestro extenso catálogo de libros digitales.
+                </p>
+                <button id="toggleInfo" class="btn btn-primary">Más Información</button>
+            </div>
+        </div>
+
+        <div class="container my-5">
+            <div id="infoSection" style="display: none;">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">¡Empieza a explorar y encuentra tu próxima gran lectura!</h4>
+                    <p>
+                        BooksFree es tu plataforma digital integral para la visualización, búsqueda y descarga de libros. Explora nuestra biblioteca en línea, que reúne una amplia variedad de títulos clasificados por categoría, autor y editorial. Nuestro objetivo es brindarte acceso rápido y sencillo a recursos educativos y de entretenimiento, ampliando tus horizontes de conocimiento.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container d-flex justify-content-center align-items-center my-4">
+            <hr class="w-100">
+        </div>
+
+        <div id="libros-recientes" th:if="${librosRecientes}">
+            <div class="container my-5">
+                <h2 class="text-center mb-4 fw-bold">Libros Recientemente Subidos</h2>
+                <!-- Inicio de Cards en una sola fila -->
+                <div class="row">
+                    <div class="col-3" th:each="libro : ${librosRecientes}">
+                        <div class="card cover-libros">
+                            <a th:href="|@{/catalogo/}${libro.idLibro}|">
+                                <img th:src="'data:image/jpeg;base64,' + ${libro.fotoBase64}" class="card-img-top libro-imagen" alt="imagen-libro">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin de Cards -->
+            </div>
+        </div>
+
+        <div class="container d-flex justify-content-center align-items-center my-4">
+            <hr class="w-100">
+        </div>
+
+        <div id="nosotros">
+            <div class="container d-flex align-items-center justify-content-center my-5">
+                <div class="row w-100 contenido-nosotros">
+                    <div class="col-md-5 mb-5 mb-md-0">
+                        <img th:src="@{/img/persona_leyendo.jpg}" alt="persona-leyendo" class="img-fluid rounded shadow" width="400px">
+                    </div>
+                    <div class="col-md-7 nosotros-texto">
+                        <h2 class="fw-bold mb-4">Sobre Nosotros</h2>
+                        <p>
+                            BooksFree es una plataforma en línea diseñada para facilitar la visualización, búsqueda y descarga de libros digitales. 
+                           Con una interfaz intuitiva y amigable, permite a los usuarios encontrar sus libros favoritos de manera eficiente y rápida.
+                        </p>
+                        <p>
+                            Entre sus principales características se encuentran:
+                        </p>
+                        <ul>
+                            <li>Búsqueda de libros por categoría, autor y editorial.</li>
+                            <li>Acceso a una amplia biblioteca digital con opciones de descarga.</li>
+                            <li>Plataforma optimizada para ofrecer recomendaciones personalizadas.</li>
+                            <li>Interfaz moderna y fácil de usar para todos los lectores.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{users/master-page :: footer}"></footer>
+
+    <script th:src="@{/public/inicio_script.js}"></script>
+</body>
+</html>

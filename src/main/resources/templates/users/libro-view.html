@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org/">
+<head th:replace="~{users/master-page :: head-mp}"></head>
+<head>
+    <title th:text="|Libro - ${libro.titulo}|"></title>
+    <link rel="stylesheet" th:href="@{/users/libro_view_estilo.css}">
+</head>
+<body>
+    <header th:replace="~{users/master-page :: header-navbar}"></header>
+    
+    <main>
+        <div class="container-fluid">
+            <hr>
+        </div>
+
+        <div class="container">
+            <div class="card shadow-sm">
+                <div class="card-body vista-libro-completa">
+
+                    <!-- Sección superior: dos columnas -->
+                    <div class="row">
+                        <!-- Columna de la imagen -->
+                        <div class="col-md-4 mb-4">
+                            <img th:src="'data:image/jpeg;base64,' + ${libro.fotoBase64}" alt="imagen-libro" class="img-fluid rounded shadow img-fixed">
+                        </div>
+                        <!-- Columna del título y descripción -->
+                        <div class="col-md-8">
+                            <h1 th:text="${libro.titulo}" class="mb-3"></h1>
+                            <p th:text="${libro.descripcion}" class="lead"></p>
+                        </div>
+                    </div>
+                
+                    <!-- Card inferior con detalles adicionales -->
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3 mb-md-0">
+                                    <h6 class="text-uppercase">Año</h6>
+                                    <p th:text="${libro.anioPublicacion}"></p>
+                                </div>
+                                <div class="col-md-3 mb-3 mb-md-0">
+                                    <h6 class="text-uppercase">Autor</h6>
+                                    <p th:text="${libro.autor.autor}"></p>
+                                </div>
+                                <div class="col-md-3 mb-3 mb-md-0">
+                                    <h6 class="text-uppercase">Categoría</h6>
+                                    <p th:text="${libro.categoria.categoria}"></p>
+                                </div>
+                                <div class="col-md-3 mb-3 mb-md-0">
+                                    <h6 class="text-uppercase">Editorial</h6>
+                                    <p th:text="${libro.editorial.editorial}"></p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <a th:href="|@{/libros/descargar-libro/}${libro.idLibro}|" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-download"></i> Descargar Libro
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="container-fluid">
+            <hr>
+        </div>
+    </main>
+
+    
+
+    <footer th:replace="~{users/master-page :: footer}"></footer>
+
+    <script th:src="@{/users/libro_view_script.js}"></script>
+</body>
+</html>

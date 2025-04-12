@@ -1,0 +1,32 @@
+* {
+    color: black;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: url('../img/fondo_login.jpg') no-repeat center center/cover;
+}
+
+#logo {
+    width: 100px;
+    margin-top: -60px;
+    margin-bottom: 25px;
+}
+
+.card {
+    padding: 70px;
+    backdrop-filter: blur(3px);
+    border-radius: 15px;
+}
+
+.card-body {
+    position: relative;
+    top: 35px;
+}
+
+.card-title {
+    margin-bottom: 25px;
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="https://www.thymeleaf.org/">
+<head th:replace="~{users/master-page :: head-mp}"></head>
+<head>
+    <title>BooksFree - Catálogo</title>
+    <link rel="stylesheet" th:href="@{/users/catalogo_estilo.css}">
+</head>
+<body>
+    <header th:replace="~{users/master-page :: header-navbar}"></header>
+
+    <main>
+        <div class="mb-4" id="titulo-catalogo">
+            <div id="titulo-fondo">
+                <h2 class="fw-bold">
+                    <i class="bi bi-journal-bookmark-fill me-2"></i>
+                    Catálogo de Libros
+                </h2>
+            </div>
+        </div>
+        
+        <div class="container-fluid mt-4">
+            <hr>
+            <div class="row">
+                <!-- Filtrador y Buscador -->
+                <aside class="col-md-3 filter-section mt-3">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Busqueda y Filtros</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/catalogo}" method="get">
+                                <!-- Buscador por palabra clave -->
+                                <div class="mb-3">
+                                    <input type="text" id="palabrasClave" name="palabrasClave" class="form-control" placeholder="Ingresa una palabra clave" th:value="${palabrasClave}">
+                                </div>
+                                <!-- Selector de autores -->
+                                <div class="mb-3">
+                                    <label for="selector-autor" class="form-label">Autor</label>
+                                    <select id="selector-autor" name="selector-autor" class="form-select">
+                                        <option value="todos">Mostrar Todos</option>
+                                        <option th:each="autor : ${autores}" th:text="${autor.autor}" th:value="${autor.idAutor}" th:selected="${autor.idAutor.toString() == selectorAutor}"></option>
+                                    </select>
+                                </div>
+                                <!-- Selector de categorías -->
+                                <div class="mb-3">
+                                    <label for="selector-categoria" class="form-label">Categoría</label>
+                                    <select id="selector-categoria" name="selector-categoria" class="form-select">
+                                        <option value="todos">Mostrar Todos</option>
+                                        <option th:each="categoria : ${categorias}" th:text="${categoria.categoria}" th:value="${categoria.idCategoria}" th:selected="${categoria.idCategoria.toString() == selectorCategoria}"></option>
+                                    </select>
+                                </div>
+                                <!-- Selector de editoriales -->
+                                <div class="mb-3">
+                                    <label for="selector-editorial" class="form-label">Editorial</label>
+                                    <select id="selector-editorial" name="selector-editorial" class="form-select">
+                                        <option value="todos">Mostrar Todos</option>
+                                        <option th:each="editorial : ${editoriales}" th:text="${editorial.editorial}" th:value="${editorial.idEditorial}" th:selected="${editorial.idEditorial.toString() == selectorEditorial}"></option>
+                                    </select>
+                                </div>
+                                <!-- Selector de año -->
+                                <div class="mb-4">
+                                    <label for="selector-anioPublic" class="form-label">Año</label>
+                                    <select id="selector-anioPublic" name="selector-anioPublic" class="form-select">
+                                        <option value="todos">Mostrar Todos</option>
+                                        <option th:each="anio : ${anios}" th:text="${anio}" th:value="${anio}" th:selected="${anio.toString() == selectorAnio}"></option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                                <a th:href="@{/catalogo}" class="btn btn-secondary w-100 mt-2">Quitar Filtros</a>
+                            </form>
+                        </div>
+                    </div>
+                </aside>
+              
+                <!-- Catalogo de Libros -->
+                <div class="col-md-9 mt-3">
+                    <div class="row">
+                        <div class="col-md-3 mb-4 card-libro" th:each="libro : ${libros}">
+                            <a class="enlacesLibros" th:href="|@{/catalogo/}${libro.idLibro}|">
+                                <div class="card book-card">
+                                    <img th:src="'data:image/jpeg;base64,' + ${libro.fotoBase64}" class="card-img-top imagen-libro" alt="imagen-libro">
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${libro.titulo}"></h5>
+                                        <p class="card-text">
+                                            <small class="text-muted" th:text="|${libro.autor.autor} - ${libro.anioPublicacion}|"></small>
+                                        </p>
+                                        <p class="card-text" th:text="${libro.descripcion != null and libro.descripcion.length() > 105} ? ${libro.descripcion.substring(0,105).concat('...')} : ${libro.descripcion}"></p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <nav th:if="${libros.size() > 0}" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:each="page : ${#numbers.sequence(1, numeroFilas)}">
+                                <a class="page-link" 
+                                   th:text="${page}" 
+                                   th:href="@{'/catalogo'(page=${page}, palabrasClave=${palabrasClave}, 
+                                   selector-autor=${selectorAutor}, selector-categoria=${selectorCategoria}, 
+                                   selector-editorial=${selectorEditorial}, selector-anioPublic=${selectorAnio})}">
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div th:if="${libros.size() == 0}" class="d-flex justify-content-center align-items-center h-100">
+                        <p>No se encontraron resultados que coincidan con tu búsqueda.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="container-fluid">
+        <hr>
+    </div>
+
+    <footer th:replace="~{users/master-page :: footer}"></footer>
+
+    <script th:src="@{/users/catalogo_script.js}"></script>
+</body>
+</html>
